@@ -91,7 +91,7 @@ class UW_Shortcake {
 				shortcode_ui_register_for_shortcode( $shortcode_tag, $ui_args );
 			}
 		}
-		add_editor_style( 'http://cms.dev/wp-content/themes/uw-2014/style.dev.css?ver=3.6' );
+		add_editor_style(  get_template_directory_uri() . '/style.dev.css' );
 
 	}
 
