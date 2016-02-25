@@ -20,7 +20,11 @@ class UW_Shortcake {
 		'UW_Shortcake\Shortcodes\Accordion',
 		'UW_Shortcake\Shortcodes\Button',
 		'UW_Shortcake\Shortcodes\Trumba_RSS',
-		);
+		'UW_Shortcake\Shortcodes\Image_Slide',
+	);
+	private $templates = array(
+		'../assets/template-full-width.php'     => 'Full Width',
+	);
 	private $registered_shortcode_classes = array();
 	private $registered_shortcodes = array();
 
@@ -63,6 +67,8 @@ class UW_Shortcake {
 	private function setup_actions() {
 		spl_autoload_register( array( $this, 'autoload_shortcode_classes' ) );
 		add_action( 'init', array( $this, 'action_init_register_shortcodes' ) );
+		add_action( 'init', array( $this, 'add_styles' ) );
+		//add_action( 'init', array( $this, 'register_template' ) );		
 		add_action( 'shortcode_ui_after_do_shortcode', function( $shortcode ) {
 			return $this::get_uw_shortcake_admin_dependencies();
 		});
@@ -73,6 +79,10 @@ class UW_Shortcake {
 	 */
 	private function setup_filters() {
 		add_filter( 'pre_kses', array( $this, 'filter_pre_kses' ) );
+		//add_filter( 'page_template', array( $this, 'register_template' ) );
+		add_filter( 'page_attributes_dropdown_pages_args', array( $this, 'register_template' ) );
+		add_filter( 'wp_insert_post_data', array( $this, 'register_template' ) );
+		add_filter( 'template_include', array( $this, 'view_template' ) );
 	}
 
 	/**
@@ -91,7 +101,70 @@ class UW_Shortcake {
 				shortcode_ui_register_for_shortcode( $shortcode_tag, $ui_args );
 			}
 		}
+	}
+
+	/**
+	 * Register all of the stylesheets
+	 */
+	public function add_styles() {
 		add_editor_style(  get_template_directory_uri() . '/style.dev.css' );
+		add_editor_style(  UW_SHORTCAKE_URL_ROOT . 'assets/css/uw-module.css' );
+		wp_enqueue_style(  'uw-module-css' , $src = '/wp-content/plugins/uw-shortcake-ui/assets/css/uw-module.css' );
+	}
+
+	/**
+	 * Register the full-width template
+	 */
+	public function register_template( $atts ) {
+		// Create the key used for the themes cache
+        $cache_key = 'page_templates-' . md5( get_theme_root() . '/' . get_stylesheet() );
+
+        // Retrieve the cache list. 
+        // If it doesn't exist, or it's empty prepare an array
+        $templates = wp_get_theme()->get_page_templates();
+        if ( empty( $templates ) ) {
+                $templates = array();
+        } 
+
+        // New cache, therefore remove the old one
+        wp_cache_delete( $cache_key , 'themes');
+
+        // Now add our template to the list of templates by merging our templates
+        // with the existing templates array from the cache.
+        $templates = array_merge( $templates, $this->templates );
+
+        // Add the modified cache to allow WordPress to pick it up for listing
+        // available templates
+        wp_cache_add( $cache_key, $templates, 'themes', 1800 );
+
+        return $atts;
+	}
+
+	/**
+	 * view the full-width template
+	 */
+	public function view_template( $template ) {
+		 global $post;
+
+        if (!isset($this->templates[get_post_meta( 
+            $post->ID, '_wp_page_template', true 
+        )] ) ) {
+
+                return $template;
+
+        } 
+
+        $file = plugin_dir_path(__FILE__). get_post_meta( 
+            $post->ID, '_wp_page_template', true 
+        );
+
+        // Just to be safe, we check if the file exist first
+        if( file_exists( $file ) ) {
+                return $file;
+        } 
+        else { echo $file; }
+
+        return $template;
 
 	}
 
