@@ -34,16 +34,14 @@ class Image_Slide extends Shortcode {
 					'libraryType'	=> array( 'image' ),
 					'addButton'		=> esc_html__( 'Select Image', 'uw-shortcake' ),
 					'frameTitle'	=> esc_html__( 'Select Image', 'uw-shortcake' ),
-					'description'  	=> esc_html__( 'Image becomes backround of the slide for desktop users.', 'uw-shortcake' ),
 				),
 				array(
 					'label'  		=> esc_html__( 'Mobile Image', 'uw-shortcake' ),
-					'attr'   		=> 'mobileImage',
+					'attr'   		=> 'mobile',
 					'type'   		=> 'attachment',
 					'libraryType'	=> array( 'image' ),
-					'addButton'		=> esc_html__( 'Select Mobile Image', 'uw-shortcake' ),
-					'frameTitle'	=> esc_html__( 'Select Mobile Image', 'uw-shortcake' ),
-					'description'  	=> esc_html__( 'Image becomes backround of the slide for mobile users.', 'uw-shortcake' ),
+					'addButton'		=> esc_html__( 'Select Image', 'uw-shortcake' ),
+					'frameTitle'	=> esc_html__( 'Select Image', 'uw-shortcake' ),
 				),
 				// array(
 				// 	'label'  		=> esc_html__( 'Overlay Image', 'uw-shortcake' ),
@@ -79,18 +77,20 @@ class Image_Slide extends Shortcode {
 		if ( empty( $attrs['image'] ) ) {
 			return 'Slide must have image.';
 		}
+
+		$image = wp_get_attachment_url( $attrs[ 'image' ] , $size = 'full');
+		$mobile = empty( $attrs['mobile'] ) ? "" : wp_get_attachment_url( $attrs[ 'mobile' ] , $size = 'full');
+
 		$defaults = array(
 			'title' 		=> '',
 			'text' 			=> '',
 			'url'			=> '#',	
-			'image'			=> '',
-			'mobileImage'	=> '',
 			'align'			=> 'left',	
 		);
 		
 		$atts = shortcode_atts( $defaults, $attrs );
 
-		return sprintf('<div class="module basic-module" style="background-image: url(%s);"><img class="mobile-overlay" src="%s" style="visibility:hidden; position:absolute; %s"/><div class="mobile-image" style="background-image: url(%s);"></div><div class="basic-mod-container container side-%s"><div class="mod-text-container"><div class="mod-text"><h3>%s</h3><p>%s</p></div></div></div></div>', wp_get_attachment_url( $atts[ 'image' ] , $size = 'full'), '', '', wp_get_attachment_url( $atts[ 'mobileImage' ] , $size = 'full'), $atts['align'], $atts['title'], $atts['text']);
+		return sprintf('<div class="module basic-module" style="background-image: url(%s);"><img class="mobile-overlay" src="%s" style="visibility:hidden; position:absolute; %s"/><div class="mobile-image" style="background-image: url(%s);"></div><div class="basic-mod-container container side-%s"><div class="mod-text-container"><div class="mod-text"><h3>%s</h3><p>%s</p></div></div></div></div>', $image, '', '', $mobile, $atts['align'], $atts['title'], $atts['text']);
 	}
 
 }

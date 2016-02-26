@@ -10,7 +10,7 @@ class UW_Shortcake {
 	private $internal_shortcode_classes = array(
 		// 'UW_Shortcake\Shortcodes\Facebook',
 		// 'UW_Shortcake\Shortcodes\Iframe',
-		// 'UW_Shortcake\Shortcodes\Image_Comparison',
+		'UW_Shortcake\Shortcodes\Image_Comparison',
 		// 'UW_Shortcake\Shortcodes\Infogram',
 		// 'UW_Shortcake\Shortcodes\Rap_Genius',
 		// 'UW_Shortcake\Shortcodes\PDF',
